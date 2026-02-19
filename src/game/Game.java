@@ -8,10 +8,10 @@ public class Game {
     public void start() {
         System.out.println("=== THE BREACH ===");
         System.out.print("Enter your hacker alias: ");
-        String name = scanner.nextLine();
-        Player player = new Player(name);
+       // String name = scanner.nextLine();
+       // Player player = new Player(name);
 
-        System.out.println("Welcome, " + player.getName() + ".");
+        //System.out.println("Welcome, " + player.getName() + ".");
         // Later: load files and start gameplay
     }
 }
