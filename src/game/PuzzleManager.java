@@ -1,18 +1,166 @@
 package game;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
 public class PuzzleManager {
 
-    // ================== UN ANAGRAM A WORD ========================
-    public static void unAnagram(){
-
-    }
-
     // ================== FIND SEQUENCE PATTERN ========================
-    public static void findSequence(){
+    public static boolean findSequence(int level){
+        Random rand = new Random();
+        Scanner input = new Scanner(System.in);
+        // initializers for later (usage only in switch statement)
+        int num;
+        int num2;
+        double ans;
+        int start;
 
+        int choice = ((level == 1) ? rand.nextInt(1, 4) : (level == 2) ? rand.nextInt(4, 7) : rand.nextInt(7, 9));
+        int attempts = 2;
+        ArrayList<String> sequence = new ArrayList<String>();
+        String answer = "";
+
+        // define a random pattern depending on the level
+        switch (choice) {
+            case 1:
+                // simple addition
+                num = rand.nextInt(5) + 1;
+                sequence.add("1");
+                for (int i = 0; i < 4; i++) {
+                    int n = Integer.parseInt(sequence.get(i)) + num;
+                    sequence.add(Integer.toString(n));
+                }
+                ans = Integer.parseInt(sequence.getLast()) + num;
+                answer = Double.toString(ans);
+                break;
+
+            case 2:
+                // num to the power of 2 or 3
+                num = rand.nextInt(2, 4);
+                for (int i = 1; i < 6; i++) {
+                    int n = (int) Math.pow(i, num);
+                    sequence.add(Integer.toString(n));
+                }
+                // next term is (6 ^ num)
+                ans = Math.pow(6, num);
+                answer = Double.toString(ans);
+                break;
+
+            case 3:
+                // double of n
+                num = rand.nextInt(1, 50);
+                sequence.add(Integer.toString(num));
+                for (int i = 0; i < 4; i++) {
+                    num = num * 2;
+                    sequence.add(Integer.toString(num));
+                }
+                ans = Integer.parseInt(sequence.getLast()) * 2;
+                answer = Double.toString(ans);
+                break;
+
+            case 4:
+                // fibonacci-like sequence
+                num = rand.nextInt(1, 26);
+                sequence.add(Integer.toString(num));
+                for (int i = 0; i < 5; i++) {
+                    sequence.add(Integer.toString(num));
+                    num += Integer.parseInt(sequence.get(i));
+                }
+                ans = Integer.parseInt(sequence.getLast())
+                        + Integer.parseInt(sequence.get(sequence.size() - 2));
+                answer = Double.toString(ans);
+                break;
+
+            case 5:
+                // alternating addition / subtraction
+                num = rand.nextInt(-10, 16);
+                num2 = rand.nextInt(1, 16);
+                start = rand.nextInt(-100, 501);
+                sequence.add(Integer.toString(start));
+
+                int n;
+                for (int i = 0; i < 5; i++) {
+                    int current = Integer.parseInt(sequence.get(i));
+                    if (i % 2 == 0) {
+                        n = current + num;
+                    } else {
+                        n = current + num2;
+                    }
+                    sequence.add(Integer.toString(n));
+                }
+                ans = Integer.parseInt(sequence.getLast()) + num2; // next diff is num2
+                answer = Double.toString(ans);
+                break;
+
+            case 6:
+                // increasing difference
+                num = rand.nextInt(1, 501);
+                for (int i = 3; i < 8; i++) {
+                    sequence.add(Integer.toString(num));
+                    num += i;
+                }
+                ans = Integer.parseInt(sequence.getLast() + 8);
+                answer = Double.toString(ans);
+                break;
+
+            case 7:
+                // multiply + add
+                num = rand.nextInt(1, 6);
+                num2 = rand.nextInt(1, 13);
+                start = rand.nextInt(-50, 500);
+                sequence.add(Integer.toString(start));
+                int n2;
+                for (int i = 0; i < 5; i++) {
+                    n2 = (Integer.parseInt(sequence.get(i)) * num) + num2;
+                    sequence.add(Integer.toString(n2));
+                }
+                ans = (Integer.parseInt(sequence.getLast()) * num ) + num2;
+                answer = Double.toString(ans);
+                break;
+
+            case 8:
+                // binary addition
+                num = rand.nextInt(1, 9);
+                for (int i = 0; i < 5; i++) {
+                    String binary = Integer.toBinaryString(num);
+                    sequence.add(binary);
+                    num++;
+                }
+                sequence.add(Integer.toBinaryString(num));
+                ans = Integer.parseInt(sequence.getLast(), 2);
+                answer = Double.toString(ans);
+                break;
+
+            default:
+                return false;
+        }
+
+        System.out.println("FIND THE PATTERN TO COMPLETE THE FOLLOWING SERIES: ");
+        for (String n : sequence){
+            System.out.print(n + " ");
+        }
+        System.out.print("?");
+        System.out.println();
+
+        System.out.println("YOU HAVE 2 ATTEMPTS...");
+
+        // core logic
+        while (attempts > 0) {
+            String guess = input.nextLine();
+            if (guess.equals(answer)) {
+                System.out.println("NUMBER DECIPHERED CORRECTLY. ACCESS GRANTED.");
+                return true;
+            } else {
+                attempts--;
+                if (attempts > 0) {
+                    System.out.println("INCORRECT. PLEASE TRY AGAIN. YOU HAVE " + attempts + " ATTEMPT(S) REMAINING");
+                }
+            }
+        }
+
+        System.out.println("OUT OF ATTEMPTS. ACCESS DENIED.");
+        return false;
     }
 
 
@@ -81,7 +229,7 @@ public class PuzzleManager {
 
         // determine the max amount of shifts per level
         // easy:1-2, medium:1-4, hard:1-6
-        int maxShift = (level == 1) ? 2 : (level == 2) ? 4 : 6;
+        int maxShift = (level == 1) ? 1 : (level == 2) ? 2 : 4;
         int shift = 1 + rand.nextInt(maxShift);
 
         // "encryption" (case insensitive --> convert to uppercase)
