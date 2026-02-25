@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class PuzzleManager {
 
     // ================== FIND SEQUENCE PATTERN ========================
-    public static boolean findSequence(int level){
+    public static boolean findSequence(int level) {
         Random rand = new Random();
         Scanner input = new Scanner(System.in);
         // initializers for later (usage only in switch statement)
@@ -115,7 +115,7 @@ public class PuzzleManager {
                     n2 = (Integer.parseInt(sequence.get(i)) * num) + num2;
                     sequence.add(Integer.toString(n2));
                 }
-                ans = (Integer.parseInt(sequence.getLast()) * num ) + num2;
+                ans = (Integer.parseInt(sequence.getLast()) * num) + num2;
                 answer = Double.toString(ans);
                 break;
 
@@ -137,7 +137,7 @@ public class PuzzleManager {
         }
 
         System.out.println("FIND THE PATTERN TO COMPLETE THE FOLLOWING SERIES: ");
-        for (String n : sequence){
+        for (String n : sequence) {
             System.out.print(n + " ");
         }
         System.out.print("?");
@@ -223,7 +223,7 @@ public class PuzzleManager {
 
 
     // ===================== CAESAR'S SHIFT ========================
-    public static boolean caesarShift(int level, int attempts){
+    public static boolean caesarShift(int level, int attempts) {
         String word = genWord(level);
         Random rand = new Random();
 
@@ -236,7 +236,7 @@ public class PuzzleManager {
         String upper = word.toUpperCase();
         char[] chars = upper.toCharArray();
 
-            //caesar shift logic
+        //caesar shift logic
         for (int i = 0; i < chars.length; i++) {
             char letter = chars[i];
             if (letter >= 'A' && letter <= 'Z') {
@@ -275,7 +275,7 @@ public class PuzzleManager {
 
 
     // ================== NUMBER GUESS ========================
-    public static boolean guessNum(int level){
+    public static boolean guessNum(int level) {
         Random rand = new Random();
 
         // create random number based on level
@@ -303,7 +303,7 @@ public class PuzzleManager {
         // evaluate user's input
         Scanner input = new Scanner(System.in);
         System.out.println("PLEASE INTRODUCE ACCESS NUMBER (HINT: IT IS A NUMBER FROM 1 TO " + maxNum + "). YOU HAVE A MAXIMUM OF " + guessAtt + " ATTEMPTS.");
-            //core game logic
+        //core game logic
         while (guessAtt > 0) {
             int guess = input.nextInt();
             if (guess == num) {
@@ -325,34 +325,166 @@ public class PuzzleManager {
     }
 
 
-
     // ================== LOGIC GATE ========================
-    public static void logicGate(){
+    public static boolean logicGate(int level) {
+        Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
+        // initializers for later (usage only in switch statement)
+        int a;
+        int b;
+        int c;
+        int answer = 0;
+        int gate;
+        int expr;
 
+        int attempts = 2;
+
+        switch (level) {
+            case 1:
+                // easy: 2 inputs, single gate (AND, OR, XOR)
+                a = random.nextInt(2);
+                b = random.nextInt(2);
+                gate = random.nextInt(3);
+
+                System.out.println("\nInputs:");
+                System.out.println("A = " + a);
+                System.out.println("B = " + b);
+
+                switch (gate) {
+                    case 0:
+                        System.out.println("Gate: AND");
+                        answer = a & b;
+                        break;
+                    case 1:
+                        System.out.println("Gate: OR");
+                        answer = a | b;
+                        break;
+                    case 2:
+                        System.out.println("Gate: XOR");
+                        answer = a ^ b;
+                        break;
+                }
+                break;
+
+            case 2:
+                // medium: 2 inputs, single gate (NOT A, NAND, NOR, XOR, XNOR)
+                a = random.nextInt(2);
+                b = random.nextInt(2);
+                gate = random.nextInt(5);
+
+                System.out.println("\nInputs:");
+                System.out.println("A = " + a);
+                System.out.println("B = " + b);
+
+                switch (gate) {
+                    case 0:
+                        System.out.println("Gate: NOT (A)");
+                        answer = (a == 0) ? 1 : 0;
+                        break;
+                    case 1:
+                        System.out.println("Gate: NAND");
+                        answer = (a & b) == 1 ? 0 : 1;
+                        break;
+                    case 2:
+                        System.out.println("Gate: NOR");
+                        answer = (a | b) == 1 ? 0 : 1;
+                        break;
+                    case 3:
+                        System.out.println("Gate: XOR");
+                        answer = a ^ b;
+                        break;
+                    case 4:
+                        System.out.println("Gate: XNOR");
+                        answer = (a ^ b) == 1 ? 0 : 1;
+                        break;
+                }
+                break;
+
+            case 3:
+                // hard: 3 inputs, compound expressions
+                a = random.nextInt(2);
+                b = random.nextInt(2);
+                c = random.nextInt(2);
+                expr = random.nextInt(6);
+
+                System.out.println("\nInputs:");
+                System.out.println("A = " + a);
+                System.out.println("B = " + b);
+                System.out.println("C = " + c);
+
+                int notA = (a == 0) ? 1 : 0;
+                int notB = (b == 0) ? 1 : 0;
+                int notC = (c == 0) ? 1 : 0;
+
+                switch (expr) {
+                    case 0:
+                        System.out.println("Expression: (A AND B) OR (NOT C)");
+                        answer = (a & b) | notC;
+                        break;
+                    case 1:
+                        System.out.println("Expression: (A OR B) AND (NOT C)");
+                        answer = (a | b) & notC;
+                        break;
+                    case 2:
+                        System.out.println("Expression: (A NAND B) OR C");
+                        answer = ((a & b) == 1 ? 0 : 1) | c;
+                        break;
+                    case 3:
+                        System.out.println("Expression: (A XOR B) AND C");
+                        answer = (a ^ b) & c;
+                        break;
+                    case 4:
+                        System.out.println("Expression: NOT(A AND B) OR C");
+                        answer = ((a & b) == 1 ? 0 : 1) | c;
+                        break;
+                    case 5:
+                        System.out.println("Expression: (A OR B) AND (B OR C)");
+                        answer = (a | b) & (b | c);
+                        break;
+                }
+                break;
+
+            default:
+                return false;
+        }
+
+        while (attempts > 0) {
+            System.out.println("YOUR ANSWER (0 or 1): ");
+            int userGuess = scanner.nextInt();
+            if (userGuess == answer) {
+                System.out.println("ANSWER CORRECT. ACCESS ALLOWED.");
+                return true;
+            }
+            attempts--;
+            if (attempts > 0) {
+                System.out.println("ANSWER INCORRECT. PLEASE TRY AGAIN. YOU HAVE " + attempts + " ATTEMPT LEFT.");
+            }
+        }
+
+        System.out.println("OUT OF ATTEMPTS. UNAUTHORIZED USER. ACCESS DENIED.");
+        return false;
     }
 
+        // ================== HELPERS ========================
+        public static String genWord ( int level){
 
+            // generate new word from different complexity levels
+            String[] easy = {"UFO", "Fog", "Hex", "Orb", "Cult", "Omen", "Rune", "Veil", "Myth", "Pact"};
+            String[] medium = {"Cipher", "Shade", "Wraith", "Sigil", "Haunt", "Feral", "Shadow", "Phantom", "Oracle", "Occult", "Portal", "Relic", "Spirit", "Secret", "Cryptid", "Eclipse", "Enigma", "Ritual", "Specter", "Unknown", "Whisper", "Hidden", "Conclave", "Illusion", "Intrigue"};
+            String[] hard = {"Moonrise", "Poltergy", "Revenant", "Veilborn", "Grimoire", "Apparition", "Conspiracy", "Forbidden", "Otherworld", "Watchers", "Darkcraft", "Blacksite", "Bloodmoon", "Gatekeeper", "Nightstalk", "Shadowborn", "Truthseek", "Mindcontrol", "Necromancer", "Skinwalker", "Interdimensional", "Cryptozoology", "Paranormality", "Extraterrestrial"
+            };
 
-    // ================== HELPERS ========================
-    public static String genWord(int level) {
-        // generate new word from different complexity levels
+            Random rand = new Random();
 
-        String[] easy = {"UFO", "Fog", "Hex", "Orb", "Cult", "Omen", "Rune", "Veil", "Myth", "Pact"};
-        String[] medium = {"Cipher", "Shade", "Wraith", "Sigil", "Haunt", "Feral", "Shadow", "Phantom", "Oracle", "Occult", "Portal", "Relic", "Spirit", "Secret", "Cryptid", "Eclipse", "Enigma", "Ritual", "Specter", "Unknown", "Whisper", "Hidden","Conclave", "Illusion", "Intrigue"};
-        String[] hard = {"Moonrise", "Poltergy", "Revenant", "Veilborn", "Grimoire",  "Apparition", "Conspiracy", "Forbidden", "Otherworld", "Watchers", "Darkcraft", "Blacksite", "Bloodmoon", "Gatekeeper", "Nightstalk", "Shadowborn", "Truthseek", "Mindcontrol", "Necromancer", "Skinwalker",  "Interdimensional", "Cryptozoology", "Paranormality", "Extraterrestrial"
-        };
-
-        Random rand = new Random();
-
-        if (level == 1) {
-            int n = rand.nextInt(10);
-            return easy[n];
-        } else if (level == 2) {
-            int n = rand.nextInt(25);
-            return medium[n];
-        } else {
-            int n = rand.nextInt(25);
-            return hard[n];
+            if (level == 1) {
+                int n = rand.nextInt(10);
+                return easy[n];
+            } else if (level == 2) {
+                int n = rand.nextInt(25);
+                return medium[n];
+            } else {
+                int n = rand.nextInt(25);
+                return hard[n];
+            }
         }
     }
-}
