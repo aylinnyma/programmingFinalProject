@@ -1,54 +1,87 @@
 package game;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 
 public class GovFile {
 
-    private static final int LINES_PER_CHUNK = 5;
+    // how many lines will be printed out
+    private static final int LINES_PER_CHUNK = 45;
 
-    private final File secretFile;
+    // file and
+    private final File dataFolder;
+    private final Map<Character, String> fileMapping;
+
+    // variables initialization
     private List<List<String>> chunks;
     private int currentChunkIndex;
     private String chosenFileName;
+    private Character currentKey;
+
 
     public GovFile(String dataFolderPath) {
-        this.secretFile = new File(dataFolderPath);
+        this.dataFolder = new File(dataFolderPath);
+        this.fileMapping = new HashMap<>();
         this.chunks = new ArrayList<>();
         this.currentChunkIndex = 0;
         this.chosenFileName = null;
+        this.currentKey = null;
+        /*
+                            ROOT:/SYSTEM/ARCHIVE/INTERNAL/
+                    ├── [1] SYSTEM_LOGS/CRYPTID_DATABASE/
+                    │   ├── [A] MM-Ω/APPALACHIA-CLASSIFIED
+                    │   ├── [B] CH-Θ/LIVESTOCK-CLASSIFIED
+                    │   └── [C] SW-∆/DESERT-CLASSIFIED
+                    ├── [2] SYSTEM_LOGS/PROJECT_OBSCURA/
+                    │   ├── [D] FI-Ψ/SOUTH-PACIFIC-CLASSIFIED
+                    │   ├── [E] RWI-Ξ/EXTRATERRESTRIAL-CLASSIFIED
+                    │   ├── [F] PBB-Ω/UAP-CLASSIFIED
+                    │   └── [G] VGI-Σ/BRAZIL-CLASSIFIED
+                    └── [3] SYSTEM_LOGS/BLACK_CEDAR/
+                        ├── [H] SHC-Φ/THERMAL-CLASSIFIED
+                        ├── [I] MKU-Σ/COGNITION-CLASSIFIED
+                        ├── [J] A11-Δ/LUNAR-CLASSIFIED
+                        ├── [K] NWO-PRIME/ORIGIN
+                        └── [L] PQN-Λ/INUTERO-CLASSIFIED
+
+         */
+        // fixed mapping of files
+        fileMapping.put('A', "mothman.txt");
+        fileMapping.put('B', "chupacabras.txt");
+        fileMapping.put('C', "skinwalkers.txt");
+        fileMapping.put('D', "friendshipIsland.txt");
+        fileMapping.put('E', "incidentRoswell.txt");
+        fileMapping.put('F', "blueBook.txt");
+        fileMapping.put('G', "varginhaIncident.txt");
+        fileMapping.put('H', "humanCombustion.txt");
+        fileMapping.put('I', "mkUltra.txt");
+        fileMapping.put('J', "moonLanding.txt");
+        fileMapping.put('K', "newWorldOrder.txt");
+        fileMapping.put('L', "prenatalQuantumNightmare.txt");
     }
 
-    /**
-     * Picks a random .txt file from the data folder, reads it, and splits it into parts.
-     *
-     * @return true if a file was loaded successfully, false otherwise
-     */
-    public boolean loadRandomFile() {
-        if (!secretFile.exists() || !secretFile.isDirectory()) {
+    // load the file corresponding to the given key and split it into 45 line sized chunks
+    private boolean loadFileForKey(char key) {
+        if (!dataFolder.exists() || !dataFolder.isDirectory()) {
             return false;
         }
 
-        File[] textFiles = secretFile.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".txt");
-            }
-        });
-
-        if (textFiles == null || textFiles.length == 0) {
-            return false;
+        String fileName = fileMapping.get(key);
+        if (fileName == null) {
+            return false; // no file for this key
         }
 
-        Random random = new Random();
-        File chosenFile = textFiles[random.nextInt(textFiles.length)];
-        chosenFileName = chosenFile.getName();
+        File chosenFile = new File(dataFolder, fileName);
+        if (!chosenFile.exists() || !chosenFile.isFile()) {
+            return false;
+        }
 
         List<String> lines;
         try {
@@ -57,56 +90,53 @@ public class GovFile {
             return false;
         }
 
-        chunks = splitIntoChunks(lines, LINES_PER_CHUNK);
-        currentChunkIndex = 0;
+        this.chunks = splitIntoChunks(lines);
+        this.currentChunkIndex = 0;
+        this.chosenFileName = chosenFile.getName();
+        this.currentKey = key;
+
         return true;
     }
 
-    /**
-     * Returns the name of the currently loaded file, or null if none loaded.
-     */
+    // return name of currently loaded file, or null if none loaded
     public String getChosenFileName() {
         return chosenFileName;
     }
 
-    /**
-     * Returns whether there is another part to display.
-     */
+    // returns whether there is another part to display for the currently loaded files
     public boolean hasNextPart() {
         return currentChunkIndex < chunks.size();
     }
 
-    /**
-     * Returns the total number of parts.
-     */
-    public int getTotalParts() {
-        return chunks.size();
-    }
+    // main method
+    public List<String> getNextChunk(char fileLetter, boolean keepGoing) {
+        if (!keepGoing) {
+            return Collections.emptyList();
+        }
 
-    /**
-     * Displays the next part on the terminal. Does nothing if there are no more parts.
-     */
-    public void displayNextPart() {
+        char key = Character.toUpperCase(fileLetter);
+
+        // if nothing has been loaded yet, load the file
+        if (currentKey == null || !currentKey.equals(key)) {
+            boolean loaded = loadFileForKey(key);
+            if (!loaded) {
+                return Collections.emptyList();
+            }
+        }
+
         if (!hasNextPart()) {
-            return;
+            return Collections.emptyList();
         }
 
-        int partNumber = currentChunkIndex + 1;
-        System.out.println("Part " + partNumber + "/" + chunks.size() + ":");
-        System.out.println("----------------------------------------");
-
-        for (String line : chunks.get(currentChunkIndex)) {
-            System.out.println(line);
-        }
-
-        System.out.println("----------------------------------------");
+        List<String> part = chunks.get(currentChunkIndex);
         currentChunkIndex++;
+        return part;
     }
 
-    private static List<List<String>> splitIntoChunks(List<String> lines, int chunkSize) {
+    private static List<List<String>> splitIntoChunks(List<String> lines) {
         List<List<String>> result = new ArrayList<>();
-        for (int i = 0; i < lines.size(); i += chunkSize) {
-            int end = Math.min(i + chunkSize, lines.size());
+        for (int i = 0; i < lines.size(); i += GovFile.LINES_PER_CHUNK) {
+            int end = Math.min(i + GovFile.LINES_PER_CHUNK, lines.size());
             result.add(new ArrayList<>(lines.subList(i, end)));
         }
         return result;
