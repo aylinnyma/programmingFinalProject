@@ -12,26 +12,20 @@ import java.util.Map;
 
 public class GovFile {
 
-    // how many lines will be printed out
+    // variables declaration
     private static final int LINES_PER_CHUNK = 45;
-
-    // file and
     private final File dataFolder;
     private final Map<Character, String> fileMapping;
-
-    // variables initialization
     private List<List<String>> chunks;
     private int currentChunkIndex;
-    private String chosenFileName;
     private Character currentKey;
 
-
+    // constructor
     public GovFile(String dataFolderPath) {
         this.dataFolder = new File(dataFolderPath);
         this.fileMapping = new HashMap<>();
         this.chunks = new ArrayList<>();
         this.currentChunkIndex = 0;
-        this.chosenFileName = null;
         this.currentKey = null;
         /*
                             ROOT:/SYSTEM/ARCHIVE/INTERNAL/
@@ -69,15 +63,18 @@ public class GovFile {
 
     // load the file corresponding to the given key and split it into 45 line sized chunks
     private boolean loadFileForKey(char key) {
+        // security folder check
         if (!dataFolder.exists() || !dataFolder.isDirectory()) {
             return false;
         }
 
         String fileName = fileMapping.get(key);
+        // if no file for this key
         if (fileName == null) {
-            return false; // no file for this key
+            return false;
         }
 
+        // important: check if file exists
         File chosenFile = new File(dataFolder, fileName);
         if (!chosenFile.exists() || !chosenFile.isFile()) {
             return false;
@@ -92,20 +89,24 @@ public class GovFile {
 
         this.chunks = splitIntoChunks(lines);
         this.currentChunkIndex = 0;
-        this.chosenFileName = chosenFile.getName();
         this.currentKey = key;
 
         return true;
     }
 
-    // return name of currently loaded file, or null if none loaded
-    public String getChosenFileName() {
-        return chosenFileName;
-    }
-
     // returns whether there is another part to display for the currently loaded files
     public boolean hasNextPart() {
         return currentChunkIndex < chunks.size();
+    }
+
+    // AI method for splitting texts
+    private static List<List<String>> splitIntoChunks(List<String> lines) {
+        List<List<String>> result = new ArrayList<>();
+        for (int i = 0; i < lines.size(); i += GovFile.LINES_PER_CHUNK) {
+            int end = Math.min(i + GovFile.LINES_PER_CHUNK, lines.size());
+            result.add(new ArrayList<>(lines.subList(i, end)));
+        }
+        return result;
     }
 
     // main method
@@ -131,14 +132,5 @@ public class GovFile {
         List<String> part = chunks.get(currentChunkIndex);
         currentChunkIndex++;
         return part;
-    }
-
-    private static List<List<String>> splitIntoChunks(List<String> lines) {
-        List<List<String>> result = new ArrayList<>();
-        for (int i = 0; i < lines.size(); i += GovFile.LINES_PER_CHUNK) {
-            int end = Math.min(i + GovFile.LINES_PER_CHUNK, lines.size());
-            result.add(new ArrayList<>(lines.subList(i, end)));
-        }
-        return result;
     }
 }

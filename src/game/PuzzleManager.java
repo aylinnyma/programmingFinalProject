@@ -10,10 +10,10 @@ public class PuzzleManager {
     public static boolean findSequence(int level) {
         Random rand = new Random();
         Scanner input = new Scanner(System.in);
-        // initializers for later (usage only in switch statement)
+        // variables declaration for later (usage only in switch statement)
         int num;
         int num2;
-        int ans; // FIXED: Changed to int to avoid .0 in string comparison
+        int ans;
         int start;
 
         int choice = ((level == 1) ? rand.nextInt(1, 4) : (level == 2) ? rand.nextInt(4, 7) : rand.nextInt(7, 9));
@@ -100,7 +100,7 @@ public class PuzzleManager {
                     sequence.add(Integer.toString(num));
                     num += i;
                 }
-                // FIXED: Corrected parsing logic to add 8 instead of concatenating it
+
                 ans = Integer.parseInt(sequence.getLast()) + 8;
                 answer = Integer.toString(ans);
                 break;
@@ -124,13 +124,10 @@ public class PuzzleManager {
                 // binary addition
                 num = rand.nextInt(1, 9);
                 for (int i = 0; i < 5; i++) {
-                    String binary = Integer.toBinaryString(num);
-                    sequence.add(binary);
+                    sequence.add(Integer.toBinaryString(num));
                     num++;
                 }
-                sequence.add(Integer.toBinaryString(num));
-                ans = Integer.parseInt(sequence.getLast(), 2);
-                answer = Integer.toString(ans);
+                answer = Integer.toBinaryString(num);
                 break;
 
             default:
@@ -185,6 +182,7 @@ public class PuzzleManager {
 
         String binary = Integer.toBinaryString(num);
         String decimal = Integer.toString(num);
+        String target = (type == 0) ? decimal : binary;
 
         while (attempts > 0) {
             if (type == 0) {
@@ -195,10 +193,9 @@ public class PuzzleManager {
                 System.out.println("                        " + decimal);
             }
 
+            System.out.print("\nENTER CODE >>> ");
             String guess = input.nextLine().trim();
             attempts--;
-
-            String target = (type == 0) ? decimal : binary;
 
             if (guess.equals(target)) {
                 System.out.println("CONVERSION SUCCESSFUL. ACCESS GRANTED.");
@@ -214,7 +211,6 @@ public class PuzzleManager {
 
 
     // ===================== CAESAR'S SHIFT ========================
-    // FIXED: Changed signature to take only 'level' to match Game.java call
     public static boolean caesarShift(int level) {
         int attempts = 2;
         String word = genWord(level);
@@ -234,12 +230,13 @@ public class PuzzleManager {
         }
 
         String cipher = new String(chars);
-        System.out.println("Decipher this Word: " + cipher);
+        System.out.println("DECIPHER THIS WORD: " + cipher);
+        System.out.println("HINT: THE LETTERS ARE SHIFTED BETWEEN 1 AND " + maxShift + " LETTERS");
 
         Scanner input = new Scanner(System.in);
 
         while (attempts > 0) {
-            System.out.println("Enter your guess:");
+            System.out.println("ENTER DECIPHERED WORD:");
             String guess = input.nextLine().trim();
 
             if (word.equalsIgnoreCase(guess)) {
@@ -291,7 +288,7 @@ public class PuzzleManager {
                 continue;
             }
             int guess = input.nextInt();
-            input.nextLine(); // FIXED: Consume newline
+            input.nextLine();
 
             if (guess == num) {
                 System.out.println("NUMBER GUESSED CORRECTLY. ACCESS ALLOWED.");
@@ -352,15 +349,14 @@ public class PuzzleManager {
                 c = random.nextInt(2);
                 expr = random.nextInt(6);
                 System.out.println("\nInputs: A = " + a + ", B = " + b + ", C = " + c);
-                int notA = (a == 0) ? 1 : 0;
                 int notC = (c == 0) ? 1 : 0;
                 switch (expr) {
-                    case 0 -> { System.out.println("Expression: (A AND B) OR (NOT C)"); answer = (a & b) | notC; }
-                    case 1 -> { System.out.println("Expression: (A OR B) AND (NOT C)"); answer = (a | b) & notC; }
-                    case 2 -> { System.out.println("Expression: (A NAND B) OR C"); answer = ((a & b) == 1 ? 0 : 1) | c; }
-                    case 3 -> { System.out.println("Expression: (A XOR B) AND C"); answer = (a ^ b) & c; }
-                    case 4 -> { System.out.println("Expression: NOT(A AND B) OR C"); answer = ((a & b) == 1 ? 0 : 1) | c; }
-                    case 5 -> { System.out.println("Expression: (A OR B) AND (B OR C)"); answer = (a | b) & (b | c); }
+                    case 0 -> { System.out.println("(A AND B) OR (NOT C)"); answer = (a & b) | notC; }
+                    case 1 -> { System.out.println("(A OR B) AND (NOT C)"); answer = (a | b) & notC; }
+                    case 2 -> { System.out.println("(A NAND B) OR C"); answer = ((a & b) == 1 ? 0 : 1) | c; }
+                    case 3 -> { System.out.println("(A XOR B) AND C"); answer = (a ^ b) & c; }
+                    case 4 -> { System.out.println("NOT(A AND B) OR C"); answer = ((a & b) == 1 ? 0 : 1) | c; }
+                    case 5 -> { System.out.println("(A OR B) AND (B OR C)"); answer = (a | b) & (b | c); }
                 }
                 break;
             default: return false;
@@ -393,7 +389,7 @@ public class PuzzleManager {
         Random rand = new Random();
         if (level == 1) return easy[rand.nextInt(easy.length)];
         if (level == 2) return medium[rand.nextInt(medium.length)];
-        // FIXED: Used array.length to avoid index errors
+
         return hard[rand.nextInt(hard.length)];
     }
 }
