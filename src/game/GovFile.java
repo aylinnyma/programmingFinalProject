@@ -99,7 +99,7 @@ public class GovFile {
         return currentChunkIndex < chunks.size();
     }
 
-    // AI method for splitting texts
+    // splitting texts
     private static List<List<String>> splitIntoChunks(List<String> lines) {
         List<List<String>> result = new ArrayList<>();
         for (int i = 0; i < lines.size(); i += GovFile.LINES_PER_CHUNK) {
